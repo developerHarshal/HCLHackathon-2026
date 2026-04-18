@@ -1,12 +1,23 @@
 Credit Card Application
 
+Tech Stack: NextJs, ReactJs, Redux.
+
 Pages: 1. New Application Registration 2. Application Status Check
 a. Status Form & Status View 3. Approver:
 a. Approver Dashboard
 b. View Application
 
 1. Application Submission Form:
-   - Basic details like Name, Contact No. Email, Address, Pan, Occupation, Annual Income, DOB, Income Proof
+   - Basic details like
+     Name
+     Contact No. - Phone num. validation
+     Email - Email Validation
+     Address,
+     Pan (Add Mask) and Eye Button to view,
+     Occupation,
+     Annual Income,
+     DOB,
+     Income Proof
 
 - On Application Submission,
   BE will check if Application already exists, 1. If Exists - Return existing Application No. and application Status 2. In Not exists - Create New Application and return application number
@@ -16,7 +27,7 @@ b. View Application
 
 2. View Application Status Page:
    - Form that will accept - Application number, - Contact Number - Pan No. - On Submit - If Values match to the application details, Show OTP verification Screen.
-     OTP Verification Popup - - Enter OTP Text box - Submit Action button - Resend OTP (with count down timer)
+     OTP Verification Popup - - Enter OTP Text box - Submit Action button - Resend OTP (with count down timer) - Security Checks - Resend OTP has 2 mins Time to avoid multiple Resends - Max Retries allowed - 3
    - Once the OTP is submitted and successful, take user to the application Status Page
      - On Status Page, show details like - Application number, - Applicant Name, Status, Reason for rejection (if rejected status) - Tracking details if Credit card Dispatched Status
 
@@ -26,7 +37,8 @@ b. View Application
 
 - Username
 - Password
-  - If Valid BE will send Token, STore it in cookie and User Details in State, and use it further throughout the application. Send JWT Token on authenticated requests.
+  - If Valid BE will send Token, Store it in cookie. Send JWT Token on authenticated requests.
+  - Cookies Prefered over local storage so that we can add it with HTTP Only (JS Cannot access cookies directly)and secure cookies, SameSite=strict
 
 2. Application Dashboard
 
@@ -45,4 +57,4 @@ b. View Application
   - Action buttons - Approve / Reject
 - On Credit score fetch Error -
   - Do not Enable Approval fields, Since we have approval condition based on credit score.
-  - Display the message to the user saying Error in Fetching Credit Scor Retry in some time.
+  - Display the message to the user saying Error in Fetching Credit Score Retry in some time.
