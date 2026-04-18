@@ -10,8 +10,14 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+  MAX_APPLICATIONS,
+  canSubmitMoreApplications,
+  getApplicationNumbers,
+  storeApplicationNumber,
+} from "@/lib/client-app-cookies";
 import { phoneDigits, registerSchema } from "@/lib/register-schema";
 import { normalizePan } from "@/lib/validation";
 
@@ -29,11 +35,18 @@ const defaultValues = {
 const MAX_INCOME_PROOF_BYTES = 5 * 1024 * 1024;
 
 export default function ApplicationForm() {
+  const [storedNumbers, setStoredNumbers] = useState([]);
   const [file, setFile] = useState(null);
   const [fileInputKey, setFileInputKey] = useState(0);
   const [panVisible, setPanVisible] = useState(false);
   const [apiError, setApiError] = useState("");
   const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    setStoredNumbers(getApplicationNumbers());
+  }, []);
+
+  const atLimit = storedNumbers.length >= MAX_APPLICATIONS;
 
   const {
     register,
@@ -51,6 +64,12 @@ export default function ApplicationForm() {
   const onSubmit = handleSubmit(async (data) => {
     setApiError("");
     setResult(null);
+    if (!canSubmitMoreApplications()) {
+      setApiError(
+        `can submit at most ${MAX_APPLICATIONS} applications from this browser.`,
+      );
+      return;
+    }
     if (!file) {
       setError("incomeProof", {
         type: "manual",
@@ -86,13 +105,17 @@ export default function ApplicationForm() {
       if (!res.ok) {
         if (payload.errors && typeof payload.errors === "object") {
           Object.entries(payload.errors).forEach(([k, v]) =>
-            setError(k, { type: "server", message: String(v) })
+            setError(k, { type: "server", message: String(v) }),
           );
         }
         setApiError(payload.message || "Submission failed");
         return;
       }
       setResult(payload);
+      if (payload.applicationNumber) {
+        const next = storeApplicationNumber(payload.applicationNumber);
+        setStoredNumbers(next);
+      }
       if (!payload.alreadyExists) {
         reset(defaultValues);
         setFile(null);
@@ -106,6 +129,40 @@ export default function ApplicationForm() {
   return (
     <Box component="form" onSubmit={onSubmit} noValidate autoComplete="off">
       <Stack spacing={2}>
+        {storedNumbers.length > 0 ? (
+          <Alert severity={atLimit ? "warning" : "info"}>
+            <Stack spacing={1}>
+              <span>
+                Your applications <br />
+                {/* ({storedNumbers.length}/{MAX_APPLICATIONS}):{" "} */}
+                {storedNumbers.join(", ")}
+              </span>
+              <Stack
+                direction="row"
+                gap={2}
+                flexWrap="wrap"
+                alignItems="center"
+              >
+                <Link component={NextLink} href="/status">
+                  View status page
+                </Link>
+                {!atLimit ? (
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="outlined"
+                    onClick={() => {
+                      window.location.assign("/register");
+                    }}
+                  >
+                    {"  "}Submit new application
+                  </Button>
+                ) : null}
+              </Stack>
+            </Stack>
+          </Alert>
+        ) : null}
+
         <TextField
           required
           label="Name"
@@ -287,9 +344,18 @@ export default function ApplicationForm() {
         </Box>
 
         <Box>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting || atLimit}
+          >
             {isSubmitting ? "Submitting…" : "Submit application"}
           </Button>
+          {atLimit ? (
+            <FormHelperText error sx={{ mt: 1 }}>
+              Maximum {MAX_APPLICATIONS} applications reached for this browser.
+            </FormHelperText>
+          ) : null}
         </Box>
 
         {apiError ? <Alert severity="error">{apiError}</Alert> : null}
