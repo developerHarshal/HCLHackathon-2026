@@ -1,3 +1,7 @@
+import Login from "../../../component/login";
+
 export default function ApproverLoginPage() {
-  return <div>Approver Login</div>;
+  return <div>
+    <Login />
+  </div>;
 }

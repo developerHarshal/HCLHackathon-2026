@@ -1,3 +1,7 @@
+import Dashboard from "../../../component/dashboard";
+
 export default function ApproverDashboardPage() {
-  return <div>Approver Dashboard</div>;
+  return <div>
+    <Dashboard />
+  </div>;
 }
