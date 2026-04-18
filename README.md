@@ -14,10 +14,10 @@ b. View Application
      Email - Email Validation
      Address,
      Pan (Add Mask) and Eye Button to view,
-     Occupation,
+     Occupation - Text Area,
      Annual Income,
-     DOB,
-     Income Proof
+     DOB (Date field),
+     Income Proof (Files upload)
 
 - On Application Submission,
   BE will check if Application already exists, 1. If Exists - Return existing Application No. and application Status 2. In Not exists - Create New Application and return application number
@@ -26,6 +26,7 @@ b. View Application
     If Exists: Show a message saying application already Exists, It will show Application No. and message saying you can check the Application and dispatch status details here: [View Status link]
 
 2. View Application Status Page:
+
    - Form that will accept - Application number, - Contact Number - Pan No. - On Submit - If Values match to the application details, Show OTP verification Screen.
      OTP Verification Popup - - Enter OTP Text box - Submit Action button - Resend OTP (with count down timer) - Security Checks - Resend OTP has 2 mins Time to avoid multiple Resends - Max Retries allowed - 3
    - Once the OTP is submitted and successful, take user to the application Status Page
